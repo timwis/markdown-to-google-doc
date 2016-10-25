@@ -7,7 +7,7 @@ main () {
   assert_dep 'pandoc'
   assert_dep 'gdrive'
 
-  temp_file=$(mktemp "${TMPDIR:-/tmp}/$1.docx")
+  temp_file=$(mktemp "$1.docx")
 
   pandoc "$1" -f markdown -t docx -o "$temp_file"
 
