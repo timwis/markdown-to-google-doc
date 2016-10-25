@@ -4,12 +4,15 @@ main () {
   [ ! "$1" ] && usage && exit 1
   [ "$1" = '-h' ] && usage && exit 0
 
+  [ -f "$HOME/.md2gdrc" ] && source "$HOME/.md2gdrc"
+  [ -f "$MD2GD_DIR/reference.docx" ] && REFERENCE_DOCX="--reference-docx=$MD2GD_DIR/reference.docx"
+
   assert_dep 'pandoc'
   assert_dep 'gdrive'
 
   temp_file=$(mktemp "$1.docx")
 
-  pandoc "$1" -f markdown -t docx -o "$temp_file"
+  pandoc "$1" --from markdown --to docx "$REFERENCE_DOCX" -o "$temp_file"
 
   [ $? -ne 0 ] && { printf "md2gd: Conversion failed\n"; rm "$temp_file"; exit 1; }
 
