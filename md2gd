@@ -4,6 +4,9 @@ main () {
   [ ! "$1" ] && usage && exit 1
   [ "$1" = '-h' ] && usage && exit 0
 
+  assert_dep 'pandoc'
+  assert_dep 'gdrive'
+
   temp_file=$(mktemp "${TMPDIR:-/tmp}/$1.docx")
 
   pandoc "$1" -f markdown -t docx -o "$temp_file"
@@ -17,6 +20,12 @@ main () {
 
 usage () {
   echo 'usage: md2gd <file>'
+}
+
+assert_dep () {
+  type "$1" > /dev/null 2>&1
+  [ $? -eq 0 ] && return
+  [ $? -ne 0 ] && { printf "dependency %s not found\n" "$1"; exit 1; }
 }
 
 main "$@"
