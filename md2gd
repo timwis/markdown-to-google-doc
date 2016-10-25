@@ -1,0 +1,23 @@
+#!/bin/sh
+
+main () {
+  [ ! "$1" ] && usage && exit 1
+  [ "$1" = '-h' ] && usage && exit 0
+
+  temp_file=$(mktemp "${TMPDIR:-/tmp}/$1.docx")
+
+  pandoc "$1" -f markdown -t docx -o "$temp_file"
+
+  gdrive import "$temp_file"
+
+  rm "$temp_file"
+
+  exit 0
+}
+
+usage () {
+  echo 'usage: md2gd <file>'
+}
+
+main "$@"
+
