@@ -11,7 +11,13 @@ main () {
 
   pandoc "$1" -f markdown -t docx -o "$temp_file"
 
-  gdrive import "$temp_file"
+  [ $? -ne 0 ] && { printf "md2gd: Conversion failed\n"; rm "$temp_file"; exit 1; }
+
+  doc_id=($(gdrive import "$temp_file" | awk '/Imported/{print $2}'))
+
+  [ $? -ne 0 ] && { printf "md2gd: Import failed\n"; rm "$temp_file"; exit 1; }
+
+  printf "Imported to https://docs.google.com/document/d/%s/edit\n" "$doc_id"
 
   rm "$temp_file"
 
