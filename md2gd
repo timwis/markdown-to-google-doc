@@ -1,14 +1,10 @@
 #!/bin/sh
 
-main () {
-  [ ! "$1" ] && usage && exit 1
-  [ "$1" = '-h' ] && usage && exit 0
+[ -f "$HOME/.md2gdrc" ] && source "$HOME/.md2gdrc"
 
-  [ -f "$HOME/.md2gdrc" ] && source "$HOME/.md2gdrc"
+import () {
+  # If reference file exists, include it as a pandoc argument
   [ -f "$MD2GD_DIR/reference.docx" ] && REFERENCE_DOCX="--reference-docx=$MD2GD_DIR/reference.docx"
-
-  assert_dep 'pandoc'
-  assert_dep 'gdrive'
 
   temp_file=$(mktemp "$1.docx")
 
@@ -27,8 +23,28 @@ main () {
   exit 0
 }
 
+export_ () {
+  file_name="$(gdrive export "$1" --force --mime application/vnd.openxmlformats-officedocument.wordprocessingml.document | cut -d "'" -f2)"
+
+  [ $? -ne 0 ] && { printf "md2gd: Export failed\n"; exit 1; }
+
+  pandoc "$file_name" --from docx --to markdown_github -o "$file_name.md"
+
+  [ $? -ne 0 ] && { printf "md2gd: Conversion failed\n"; rm "$file_name"; exit 1; }
+
+  printf "Exported to %s.md\n" "$file_name"
+
+  rm "$file_name"
+
+  exit 0
+}
+
 usage () {
-  echo 'usage: md2gd <file>'
+  cat <<EOF
+usage:
+  md2gd import <file>
+  md2gd export <docid>
+EOF
 }
 
 assert_dep () {
@@ -37,5 +53,12 @@ assert_dep () {
   [ $? -ne 0 ] && { printf "dependency %s not found\n" "$1"; exit 1; }
 }
 
-main "$@"
+assert_dep 'pandoc'
+assert_dep 'gdrive'
+
+case $1 in
+  import) shift; import "$@";;
+  export) shift; export_ "$@";;
+  *) usage; exit 1;;
+esac
 

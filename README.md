@@ -6,7 +6,8 @@ Requires [pandoc](http://pandoc.org) and [gdrive cli](https://github.com/prasmus
 
 ## Usage
 ```bash
-md2gd <file>
+md2gd import <file>
+md2gd export <docid>
 ```
 
 ## Installation
