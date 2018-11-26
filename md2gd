@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 [ -f "$HOME/.md2gdrc" ] && source "$HOME/.md2gdrc"
 
