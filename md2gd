@@ -6,7 +6,7 @@ import () {
   # If reference file exists, include it as a pandoc argument
   [ -f "$MD2GD_DIR/reference.docx" ] && REFERENCE_DOCX="--reference-docx=$MD2GD_DIR/reference.docx"
 
-  temp_file=$(mktemp --suffix=".docx" "/$1.XXX")
+  temp_file=$(mktemp --suffix=".docx" "$1.XXX")
 
   pandoc "$1" --from markdown --to docx "$REFERENCE_DOCX" -o "$temp_file"
 
